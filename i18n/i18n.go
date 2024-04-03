@@ -4,7 +4,6 @@ import (
 	"embed"
 	"encoding/json"
 	"path"
-	"slices"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/pelletier/go-toml/v2"
@@ -29,6 +28,7 @@ func mustLoad(localePath string, fs *embed.FS) {
 	if err != nil {
 		panic(err)
 	}
+
 	for _, f := range info {
 		if f.IsDir() {
 			mustLoad(path.Join(localePath, f.Name()), fs)
@@ -44,30 +44,7 @@ func mustLoad(localePath string, fs *embed.FS) {
 }
 
 func Get(key string, lng ...string) string {
-	parsedLngs := make([]string, 0)
-
-	for _, l := range lng {
-		tags, q, err := language.ParseAcceptLanguage(l)
-		if err != nil {
-			continue
-		}
-
-		slices.SortFunc(q, func(a, b float32) int {
-			if a > b {
-				return 1
-			} else if a == b {
-				return 0
-			} else {
-				return -1
-			}
-		})
-
-		for i, _ := range q {
-			parsedLngs = append(parsedLngs, tags[i].String())
-		}
-	}
-
-	l := i18n.NewLocalizer(bundle, parsedLngs...)
+	l := i18n.NewLocalizer(bundle, lng...)
 	value, err := l.Localize(&i18n.LocalizeConfig{MessageID: key})
 	if err != nil {
 		return key
