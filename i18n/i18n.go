@@ -13,6 +13,7 @@ import (
 
 var bundle *i18n.Bundle
 
+// MustInit loads all locale files from the given directory and panics if an error occurs.
 func MustInit(localePath string, fs *embed.FS) {
 
 	bundle = i18n.NewBundle(language.English)
@@ -43,6 +44,10 @@ func mustLoad(localePath string, fs *embed.FS) {
 	}
 }
 
+// Get returns a localized message for the given key and language.
+//
+// If no language is provided, it will use the default language.
+// If the key does not exist in the translation file, it will return the key itself.
 func Get(key string, lng ...string) string {
 	l := i18n.NewLocalizer(bundle, lng...)
 	value, err := l.Localize(&i18n.LocalizeConfig{MessageID: key})
